@@ -1,7 +1,19 @@
-const { SUPABASE_URL, SUPABASE_KEY } = window.APP_CONFIG || {};
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
 const $ = (id) => document.getElementById(id);
+
+// 起動時に何か失敗しても真っ白にならないよう、エラーを画面に出す
+const showFatal = (msg) => {
+  $('fatal').hidden = false;
+  $('fatal').textContent = `読み込みエラー: ${msg}（再読み込みしてください）`;
+};
+window.addEventListener('error', (e) => showFatal(e.message));
+window.addEventListener('unhandledrejection', (e) => showFatal(e.reason?.message || e.reason));
+
+const { SUPABASE_URL, SUPABASE_KEY } = window.APP_CONFIG || {};
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  // iPhone の Safari / ホーム画面アプリで navigator.locks が固まり、
+  // ログイン状態の復元が終わらない既知の問題を避ける（1タブ利用前提なので問題なし）
+  auth: { lock: (_name, _timeout, fn) => fn() },
+});
 let currentUser = null;
 let action = 'login';
 
@@ -32,15 +44,27 @@ $('auth-form').addEventListener('submit', async (e) => {
 
 $('logout').addEventListener('click', () => sb.auth.signOut());
 
-sb.auth.onAuthStateChange((_event, session) => {
+let authResolved = false;
+function render(session) {
+  authResolved = true;
+  $('loading').hidden = true;
   currentUser = session?.user ?? null;
   $('auth-view').hidden = !!currentUser;
   $('app-view').hidden = !currentUser;
   if (currentUser) {
     $('me').textContent = currentUser.email;
-    loadTimeline();
+    // コールバック内で Supabase を直接呼ぶと固まることがあるので、一拍おいて読み込む
+    setTimeout(loadTimeline, 0);
   }
-});
+}
+sb.auth.onAuthStateChange((_event, session) => render(session));
+
+// 万一ログイン状態の確認が終わらなくても、ログイン画面は出す
+setTimeout(() => {
+  if (authResolved) return;
+  render(null);
+  $('auth-msg').textContent = 'ログイン状態を確認できませんでした。もう一度ログインしてください。';
+}, 6000);
 
 // ---- 投稿 ----
 $('content').addEventListener('input', () => {
@@ -49,7 +73,7 @@ $('content').addEventListener('input', () => {
 
 // ---- 音声入力（Web Speech API。非対応ブラウザではボタンを出さない） ----
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-if (SpeechRecognition) {
+if (SpeechRecognition) try {
   const rec = new SpeechRecognition();
   rec.lang = 'ja-JP';
   rec.interimResults = true;
@@ -82,6 +106,9 @@ if (SpeechRecognition) {
     $('post-msg').textContent =
       e.error === 'not-allowed' ? 'マイクの使用が許可されていません。ブラウザの設定を確認してください。' : `音声入力エラー: ${e.error}`;
   };
+} catch {
+  // 音声入力が使えない環境ではボタンを出さないだけにする
+  $('mic').hidden = true;
 }
 
 $('post-form').addEventListener('submit', async (e) => {
