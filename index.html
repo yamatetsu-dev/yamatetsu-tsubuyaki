@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ヤマテツつぶやき</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <h1>ヤマテツつぶやき</h1>
+
+    <section id="auth-view" hidden>
+      <form id="auth-form">
+        <input id="email" type="email" placeholder="メールアドレス" required autocomplete="email">
+        <input id="password" type="password" placeholder="パスワード（6文字以上）" required minlength="6" autocomplete="current-password">
+        <div class="row">
+          <button type="submit" data-action="login">ログイン</button>
+          <button type="submit" data-action="signup" class="secondary">新規登録</button>
+        </div>
+      </form>
+      <p id="auth-msg" class="msg"></p>
+    </section>
+
+    <section id="app-view" hidden>
+      <div class="row between">
+        <span id="me"></span>
+        <button id="logout" class="secondary">ログアウト</button>
+      </div>
+      <form id="post-form">
+        <textarea id="content" maxlength="280" placeholder="いまどうしてる？" required></textarea>
+        <div class="row between">
+          <span id="count">0 / 280</span>
+          <button type="submit">投稿する</button>
+        </div>
+      </form>
+      <p id="post-msg" class="msg"></p>
+      <ul id="timeline"></ul>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; background: #f5f8fa; color: #0f1419; }
+main { max-width: 600px; margin: 0 auto; padding: 16px; }
+h1 { font-size: 22px; }
+input, textarea { width: 100%; padding: 10px; margin-bottom: 8px; font-size: 16px; border: 1px solid #cfd9de; border-radius: 8px; }
+textarea { height: 90px; resize: vertical; }
+button { padding: 8px 18px; border: none; border-radius: 999px; background: #1d9bf0; color: #fff; font-weight: bold; cursor: pointer; }
+button.secondary { background: #fff; color: #0f1419; border: 1px solid #cfd9de; }
+button:disabled { opacity: .5; }
+.row { display: flex; gap: 8px; align-items: center; }
+.between { justify-content: space-between; }
+.msg { color: #d0021b; min-height: 1em; }
+#timeline { list-style: none; padding: 0; }
+#timeline li { background: #fff; border: 1px solid #e6ecf0; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+.meta { font-size: 13px; color: #536471; display: flex; justify-content: space-between; }
+.body { white-space: pre-wrap; word-break: break-word; margin-top: 6px; }
+.del { background: none; color: #d0021b; padding: 0; font-weight: normal; }

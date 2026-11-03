@@ -1,0 +1,5 @@
+# 接続情報（GitHub には上げない。デプロイ時に Actions の Secrets から生成）
+config.js
+.env
+.env.*
+!.env.example
