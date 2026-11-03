@@ -13,7 +13,10 @@ button:disabled { opacity: .5; }
 #timeline { list-style: none; padding: 0; }
 #timeline li { background: #fff; border: 1px solid #e6ecf0; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
 .meta { font-size: 13px; color: #536471; display: flex; justify-content: space-between; }
-.body { white-space: pre-wrap; word-break: break-word; margin-top: 6px; }
+.body { white-space: pre-wrap; word-break: break-word; margin-top: 6px; display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+.body input[type="checkbox"] { width: 22px; height: 22px; margin: 0; flex-shrink: 0; accent-color: #1d9bf0; }
+#timeline li.done { opacity: .55; }
+#timeline li.done .body span { text-decoration: line-through; }
 .del { background: none; color: #d0021b; padding: 0; font-weight: normal; }
 .del + .del { margin-left: 12px; }
 #mic.listening { background: #d0021b; color: #fff; border-color: #d0021b; }

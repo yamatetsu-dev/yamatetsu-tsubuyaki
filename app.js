@@ -102,7 +102,8 @@ $('post-form').addEventListener('submit', async (e) => {
 async function loadTimeline() {
   const { data, error } = await sb
     .from('posts')
-    .select('id, user_id, user_email, content, created_at')
+    .select('id, user_id, user_email, content, done, created_at')
+    .order('done', { ascending: true })
     .order('created_at', { ascending: false })
     .limit(100);
   if (error) return ($('post-msg').textContent = error.message);
@@ -111,6 +112,7 @@ async function loadTimeline() {
   ul.replaceChildren();
   for (const p of data) {
     const li = document.createElement('li');
+    if (p.done) li.className = 'done';
     const meta = document.createElement('div');
     meta.className = 'meta';
     const who = document.createElement('span');
@@ -140,9 +142,19 @@ async function loadTimeline() {
       actions.append(del);
       meta.append(actions);
     }
-    const body = document.createElement('div');
+    const body = document.createElement('label');
     body.className = 'body';
-    body.textContent = p.content;
+    const check = document.createElement('input');
+    check.type = 'checkbox';
+    check.checked = p.done;
+    check.onchange = async () => {
+      const { error } = await sb.from('posts').update({ done: check.checked }).eq('id', p.id);
+      if (error) $('post-msg').textContent = error.message;
+      loadTimeline();
+    };
+    const text = document.createElement('span');
+    text.textContent = p.content;
+    body.append(check, text);
     li.append(meta, body);
     ul.append(li);
   }
