@@ -31,7 +31,10 @@
         <textarea id="content" maxlength="280" placeholder="いまどうしてる？" required></textarea>
         <div class="row between">
           <span id="count">0 / 280</span>
-          <button type="submit">投稿する</button>
+          <div class="row">
+            <button type="button" id="mic" class="secondary" hidden>🎤 音声入力</button>
+            <button type="submit">投稿する</button>
+          </div>
         </div>
       </form>
       <p id="post-msg" class="msg"></p>

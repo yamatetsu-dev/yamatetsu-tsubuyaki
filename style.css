@@ -15,3 +15,13 @@ button:disabled { opacity: .5; }
 .meta { font-size: 13px; color: #536471; display: flex; justify-content: space-between; }
 .body { white-space: pre-wrap; word-break: break-word; margin-top: 6px; }
 .del { background: none; color: #d0021b; padding: 0; font-weight: normal; }
+.del + .del { margin-left: 12px; }
+#mic.listening { background: #d0021b; color: #fff; border-color: #d0021b; }
+
+/* スマホ向け：タップしやすく */
+@media (max-width: 600px) {
+  main { padding: 12px; }
+  button { padding: 10px 16px; font-size: 15px; }
+  .del { padding: 4px 0; font-size: 14px; }
+  #auth-form .row button { flex: 1; }
+}

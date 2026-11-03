@@ -47,6 +47,43 @@ $('content').addEventListener('input', () => {
   $('count').textContent = `${$('content').value.length} / 280`;
 });
 
+// ---- 音声入力（Web Speech API。非対応ブラウザではボタンを出さない） ----
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SpeechRecognition) {
+  const rec = new SpeechRecognition();
+  rec.lang = 'ja-JP';
+  rec.interimResults = true;
+  rec.continuous = false;
+  let listening = false;
+  let base = '';
+
+  $('mic').hidden = false;
+  $('mic').addEventListener('click', () => {
+    if (listening) return rec.stop();
+    base = $('content').value;
+    rec.start();
+  });
+  rec.onstart = () => {
+    listening = true;
+    $('mic').textContent = '⏹ 停止';
+    $('mic').classList.add('listening');
+  };
+  rec.onend = () => {
+    listening = false;
+    $('mic').textContent = '🎤 音声入力';
+    $('mic').classList.remove('listening');
+  };
+  rec.onresult = (e) => {
+    const text = Array.from(e.results).map((r) => r[0].transcript).join('');
+    $('content').value = (base + text).slice(0, 280);
+    $('content').dispatchEvent(new Event('input'));
+  };
+  rec.onerror = (e) => {
+    $('post-msg').textContent =
+      e.error === 'not-allowed' ? 'マイクの使用が許可されていません。ブラウザの設定を確認してください。' : `音声入力エラー: ${e.error}`;
+  };
+}
+
 $('post-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const content = $('content').value.trim();
@@ -80,6 +117,7 @@ async function loadTimeline() {
     who.textContent = `${p.user_email.split('@')[0]} · ${new Date(p.created_at).toLocaleString('ja-JP')}`;
     meta.append(who);
     if (p.user_id === currentUser?.id) {
+      const actions = document.createElement('span');
       const edit = document.createElement('button');
       edit.className = 'del';
       edit.textContent = '編集';
@@ -90,7 +128,7 @@ async function loadTimeline() {
         if (error) $('post-msg').textContent = error.message;
         loadTimeline();
       };
-      meta.append(edit);
+      actions.append(edit);
       const del = document.createElement('button');
       del.className = 'del';
       del.textContent = '削除';
@@ -99,7 +137,8 @@ async function loadTimeline() {
         await sb.from('posts').delete().eq('id', p.id);
         loadTimeline();
       };
-      meta.append(del);
+      actions.append(del);
+      meta.append(actions);
     }
     const body = document.createElement('div');
     body.className = 'body';
