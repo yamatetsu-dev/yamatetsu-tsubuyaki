@@ -30,6 +30,9 @@ jobs:
         run: |
           mkdir _site
           cp index.html app.js style.css _site/
+          # キャッシュ対策：CSS/JS の参照にコミットIDを付けて、更新時に必ず読み直させる
+          V=${GITHUB_SHA::7}
+          sed -i "s#href=\"style.css\"#href=\"style.css?v=$V\"#; s#src=\"config.js\"#src=\"config.js?v=$V\"#; s#src=\"app.js\"#src=\"app.js?v=$V\"#" _site/index.html
           cat > _site/config.js <<EOF
           window.APP_CONFIG = {
             SUPABASE_URL: '${SUPABASE_URL}',
